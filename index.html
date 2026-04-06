@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 績效管理系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A18;
+    --text-secondary: #6B6B65;
+    --text-muted: #A0A09A;
+    --border: rgba(0,0,0,0.08);
+    --border-hover: rgba(0,0,0,0.18);
+    --purple-bg: #EEEDFE;
+    --purple: #534AB7;
+    --purple-dark: #3C3489;
+    --teal-bg: #E1F5EE;
+    --teal: #0F6E56;
+    --amber-bg: #FAEEDA;
+    --amber: #854F0B;
+    --blue-bg: #E6F1FB;
+    --blue: #185FA5;
+    --coral-bg: #FAECE7;
+    --coral: #993C1D;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .hero {
+    background: var(--text-primary);
+    color: #fff;
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: rgba(83,74,183,0.18);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(29,158,117,0.12);
+  }
+
+  .hero-label {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.5);
+    border: 0.5px solid rgba(255,255,255,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 1.2rem;
+    font-weight: 400;
+  }
+
+  .hero h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    line-height: 1.8;
+    position: relative;
+    z-index: 1;
+  }
+
+  .flow-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .flow-pill {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    border: 0.5px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.75);
+    white-space: nowrap;
+  }
+
+  .flow-arrow {
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+  }
+
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+
+  .card-meta { flex: 1; }
+
+  .mod-num {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    margin-bottom: 3px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+
+  .timing {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border: 0.5px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .timing::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 400;
+  }
+
+  .btn {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 10px;
+    border: 0.5px solid var(--border);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+    background: var(--bg);
+  }
+
+  .btn:hover {
+    background: #EEECEA;
+    border-color: var(--border-hover);
+  }
+
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 0.5px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 3rem 1.5rem 2rem; }
+    .main { padding: 2rem 1rem 3rem; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">AI PERFORMANCE MANAGEMENT SYSTEM</div>
+  <h1>AI 績效管理系統</h1>
+  <p>五個模組涵蓋完整的績效週期，從目標設定到個人發展，每一步都有小導陪你。</p>
+  <div class="flow-bar">
+    <span class="flow-pill">職能框架</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-pill">設定承諾</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-pill">日常記錄</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-pill">年中／年底報告</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-pill">個人發展計畫</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section-label">選擇你現在需要的模組</div>
+  <div class="grid">
+
+    <div class="card" onclick="window.open('https://udify.app/chat/N0mmEjs0Sa8NyYgf','_blank')" style="cursor:pointer;">
+      <div class="card-top">
+        <div class="icon" style="background:var(--purple-bg);">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1.5" fill="#534AB7"/><rect x="11" y="3" width="6" height="6" rx="1.5" fill="#AFA9EC"/><rect x="3" y="11" width="6" height="6" rx="1.5" fill="#AFA9EC"/><rect x="11" y="11" width="6" height="6" rx="1.5" fill="#534AB7"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="mod-num" style="color:var(--purple);">模組 01</div>
+          <div class="card-title">職能框架總覽</div>
+        </div>
+      </div>
+      <span class="timing">全年參考</span>
+      <p class="card-desc">了解公司各職等的能力要求與發展路徑，是其他所有模組的基礎。查看自己目前的職等定位，以及下一個層級需要具備的能力。</p>
+      <div class="tags">
+        <span class="tag" style="background:var(--purple-bg);color:var(--purple-dark);">Career Framework</span>
+        <span class="tag" style="background:var(--purple-bg);color:var(--purple-dark);">Successful Profile</span>
+      </div>
+      <a class="btn" href="https://udify.app/chat/N0mmEjs0Sa8NyYgf" target="_blank">進入模組 1 →</a>
+    </div>
+
+    <div class="card" onclick="window.open('https://udify.app/chat/wDBjchM1PCEqBODi','_blank')" style="cursor:pointer;">
+      <div class="card-top">
+        <div class="icon" style="background:var(--teal-bg);">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#1D9E75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="mod-num" style="color:var(--teal);">模組 02</div>
+          <div class="card-title">績效承諾書</div>
+        </div>
+      </div>
+      <span class="timing">年初 / 週期開始時</span>
+      <p class="card-desc">與主管共同設定本績效週期的目標與承諾，對應職能框架的指標等級，讓期望清晰可衡量。</p>
+      <div class="tags">
+        <span class="tag" style="background:var(--teal-bg);color:var(--teal);">目標設定</span>
+        <span class="tag" style="background:var(--teal-bg);color:var(--teal);">績效指標</span>
+      </div>
+      <a class="btn" href="https://udify.app/chat/wDBjchM1PCEqBODi" target="_blank">進入模組 2 →</a>
+    </div>
+
+    <div class="card" onclick="window.open('https://udify.app/chat/LajzZwSTVFA2QHvd','_blank')" style="cursor:pointer;">
+      <div class="card-top">
+        <div class="icon" style="background:var(--amber-bg);">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="2.5" rx="1.25" fill="#BA7517"/><rect x="3" y="9" width="10" height="2.5" rx="1.25" fill="#EF9F27"/><rect x="3" y="13" width="12" height="2.5" rx="1.25" fill="#EF9F27"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="mod-num" style="color:var(--amber);">模組 03</div>
+          <div class="card-title">每日工作記錄 + STAR 引導</div>
+        </div>
+      </div>
+      <span class="timing">日常使用</span>
+      <p class="card-desc">把每天的工作亮點記錄下來。小導會用 STAR 框架引導你，把模糊的經驗轉化為清晰的績效紀錄，讓每個努力都被看見。</p>
+      <div class="tags">
+        <span class="tag" style="background:var(--amber-bg);color:var(--amber);">STAR 引導</span>
+        <span class="tag" style="background:var(--amber-bg);color:var(--amber);">績效指標標記</span>
+        <span class="tag" style="background:var(--amber-bg);color:var(--amber);">日常記錄</span>
+      </div>
+      <a class="btn" href="https://udify.app/chat/LajzZwSTVFA2QHvd" target="_blank">進入模組 3 →</a>
+    </div>
+
+    <div class="card" onclick="window.open('https://udify.app/chat/VvfOQ2stqB62tKit','_blank')" style="cursor:pointer;">
+      <div class="card-top">
+        <div class="icon" style="background:var(--blue-bg);">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2.5" stroke="#185FA5" stroke-width="1.5"/><path d="M6 10h8M6 13.5h5" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round"/><path d="M6 6.5h8" stroke="#378ADD" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="mod-num" style="color:var(--blue);">模組 04</div>
+          <div class="card-title">年中／年度績效報告</div>
+        </div>
+      </div>
+      <span class="timing">年中考核 / 年底考核</span>
+      <p class="card-desc">把承諾書與工作紀錄整合成一份完整的績效報告，自動生成員工自存版與給主管版，考核時直接使用。</p>
+      <div class="tags">
+        <span class="tag" style="background:var(--blue-bg);color:var(--blue);">員工自存版</span>
+        <span class="tag" style="background:var(--blue-bg);color:var(--blue);">給主管版</span>
+        <span class="tag" style="background:var(--blue-bg);color:var(--blue);">績效對照</span>
+      </div>
+      <a class="btn" href="https://udify.app/chat/VvfOQ2stqB62tKit" target="_blank">進入模組 4 →</a>
+    </div>
+
+    <div class="card" onclick="window.open('https://udify.app/chat/VvfOQ2stqB62tKit','_blank')" style="cursor:pointer;">
+      <div class="card-top">
+        <div class="icon" style="background:var(--purple-bg);">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3C10 3 6 6.5 6 11a4 4 0 008 0c0-4.5-4-8-4-8z" stroke="#534AB7" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M10 15v2" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="mod-num" style="color:var(--purple);">模組 05</div>
+          <div class="card-title">個人發展計畫（IDP）</div>
+        </div>
+      </div>
+      <span class="timing">每年制定一次</span>
+      <p class="card-desc">用 GROW 框架引導自我認知，結合 Career Framework 找出能力差距，制定一份有方向感、可執行的個人發展計畫。</p>
+      <div class="tags">
+        <span class="tag" style="background:var(--purple-bg);color:var(--purple-dark);">GROW 框架</span>
+        <span class="tag" style="background:var(--purple-bg);color:var(--purple-dark);">職涯發展</span>
+        <span class="tag" style="background:var(--purple-bg);color:var(--purple-dark);">每年更新</span>
+      </div>
+      <a class="btn" href="https://udify.app/chat/VvfOQ2stqB62tKit" target="_blank">進入模組 5 →</a>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  AI 績效管理系統・小導陪你走完每一步
+</div>
+
+</body>
+</html>
