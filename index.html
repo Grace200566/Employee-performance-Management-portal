@@ -263,9 +263,103 @@
     .main { padding: 2rem 1rem 3rem; }
     .grid { grid-template-columns: 1fr; }
   }
+
+  /* ── LOGIN ── */
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    background: #1A1A18;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-overlay.hidden { display: none; }
+  .login-box {
+    width: 100%;
+    max-width: 380px;
+    padding: 48px 40px;
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.04);
+    text-align: center;
+  }
+  .login-icon { font-size: 32px; margin-bottom: 20px; }
+  .login-box h2 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .login-box p { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 28px; line-height: 1.7; }
+  .login-input {
+    width: 100%;
+    padding: 13px 16px;
+    background: rgba(255,255,255,0.07);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-family: 'Noto Sans TC', sans-serif;
+    outline: none;
+    margin-bottom: 14px;
+    text-align: center;
+    letter-spacing: 0.1em;
+    transition: border-color 0.2s;
+  }
+  .login-input:focus { border-color: rgba(83,74,183,0.6); }
+  .login-btn {
+    width: 100%;
+    padding: 13px;
+    background: #534AB7;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .login-btn:hover { opacity: 0.88; }
+  .login-error { font-size: 12px; color: #f87171; margin-top: 10px; min-height: 18px; }
+  .login-footer { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 24px; letter-spacing: 0.08em; }
 </style>
 </head>
 <body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-icon">🧭</div>
+    <h2>AI 績效管理系統</h2>
+    <p>此系統僅供授權員工使用<br>請輸入存取密碼</p>
+    <input type="password" class="login-input" id="passwordInput" placeholder="輸入密碼" onkeydown="if(event.key==='Enter') checkPassword()"/>
+    <button class="login-btn" onclick="checkPassword()">進入系統</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-footer">Employee Portal · 小導陪你走完每一步</div>
+  </div>
+</div>
+
+<script>
+function checkPassword() {
+  var input = document.getElementById('passwordInput').value;
+  var error = document.getElementById('loginError');
+  if (input === 'Gkgk0681') {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    sessionStorage.setItem('ep_auth', '1');
+  } else {
+    error.textContent = '密碼錯誤，請重新輸入';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+  }
+}
+if (sessionStorage.getItem('ep_auth') === '1') {
+  document.addEventListener('DOMContentLoaded', function() {
+    var o = document.getElementById('loginOverlay');
+    if (o) o.classList.add('hidden');
+  });
+}
+</script>
 
 <div class="hero">
   <div class="hero-label">AI PERFORMANCE MANAGEMENT SYSTEM</div>
